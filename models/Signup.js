@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 // Signup schema
 const signupSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
@@ -8,8 +6,8 @@ const signupSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true, unique: true },
   
   // KYC Information (Optional)
-  aadharNumber: { type: String, unique: true, sparse: true }, // Unique but optional
-  panNumber: { type: String, unique: true, sparse: true }, // Unique but optional
+  aadharNumber: { type: String, unique: true }, // Unique but not required
+  panNumber: { type: String, unique: true }, // Unique but not required
   occupation: { type: String }, // Optional
   fullName: { type: String }, // Optional
   nomineeName: { type: String }, // Optional
@@ -28,6 +26,5 @@ const signupSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Signup', signupSchema);
 
 
