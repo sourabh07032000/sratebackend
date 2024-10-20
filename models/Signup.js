@@ -8,8 +8,8 @@ const signupSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true, unique: true },
   
   // KYC Information (Optional)
-  aadharNumber: { type: String, unique: true }, // Unique but not required
-  panNumber: { type: String, unique: true }, // Unique but not required
+  aadharNumber: { type: String}, // Unique but not required
+  panNumber: { type: String}, // Unique but not required
   occupation: { type: String }, // Optional
   fullName: { type: String }, // Optional
   nomineeName: { type: String }, // Optional
