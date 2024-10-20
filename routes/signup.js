@@ -4,11 +4,11 @@ const Signup = require('../models/Signup');
 
 // POST: Signup route (Create)
 router.post('/', async (req, res) => {
-  const { firstName, lastName, email, phoneNumber } = req.body;
+  const { firstName, lastName, email, phoneNumber, aadharNumber, panNumber, occupation, fullName } = req.body;
 
   // Validation
   if (!firstName || !lastName || !email || !phoneNumber) {
-    return res.status(400).json({ message: 'All fields are required' });
+    return res.status(400).json({ message: 'First name, last name, email, and phone number are required.' });
   }
 
   try {
@@ -18,8 +18,18 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Signup already exists with this email' });
     }
 
-    // Create new signup
-    const signup = new Signup({ firstName, lastName, email, phoneNumber });
+    // Create new signup with optional fields
+    const signup = new Signup({ 
+      firstName, 
+      lastName, 
+      email, 
+      phoneNumber, 
+      aadharNumber, 
+      panNumber, 
+      occupation, 
+      fullName 
+    });
+    
     await signup.save();
 
     res.status(201).json({ message: 'Signup registered successfully', signup });
@@ -54,7 +64,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// PUT: Update a signup by ID with KYC information
+// PUT: Update a signup by ID with optional KYC information
 router.put('/:id', async (req, res) => {
   const { 
     firstName, 
@@ -74,13 +84,13 @@ router.put('/:id', async (req, res) => {
     aadharBackPhoto 
   } = req.body;
 
-  // Validation: Ensure all fields are provided
-  if (!firstName || !lastName || !email || !phoneNumber || !aadharNumber || !panNumber || !occupation || !fullName) {
-    return res.status(400).json({ message: 'All required fields must be filled' });
+  // Validation: Ensure required fields are provided
+  if (!firstName || !lastName || !email || !phoneNumber) {
+    return res.status(400).json({ message: 'First name, last name, email, and phone number are required.' });
   }
 
   try {
-    // Find the signup by ID and update it with the KYC information
+    // Find the signup by ID and update it with provided fields
     const updatedSignup = await Signup.findByIdAndUpdate(
       req.params.id, 
       { 
@@ -114,7 +124,6 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
 // DELETE: Remove a signup by ID
 router.delete('/:id', async (req, res) => {
   try {
@@ -130,3 +139,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
