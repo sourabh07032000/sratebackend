@@ -8,8 +8,8 @@ const signupSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true, unique: true },
   
   // KYC Information (Optional)
-  aadharNumber: { type: String}, // Unique but not required
-  panNumber: { type: String}, // Unique but not required
+  aadharNumber: { type: String, unique: true, sparse: true }, // Unique but optional
+  panNumber: { type: String, unique: true, sparse: true }, // Unique but optional
   occupation: { type: String }, // Optional
   fullName: { type: String }, // Optional
   nomineeName: { type: String }, // Optional
@@ -29,4 +29,5 @@ const signupSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Signup', signupSchema);
+
 
