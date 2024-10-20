@@ -16,7 +16,7 @@ router.post('/send-otp', (req, res) => {
   const { phoneNumber } = req.body; // Get phone number from request body
 
   // Validate phone number (basic validation)
-  if (!phoneNumber || phoneNumber.length !== 10 || isNaN(phoneNumber)) {
+  if (!phoneNumber ) {
     return res.status(400).json({ success: false, message: 'Invalid phone number' });
   }
 
