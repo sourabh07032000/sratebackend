@@ -3,12 +3,13 @@ const router = express.Router();
 const Signup = require('../models/Signup');
 
 // POST: Signup route (Create)
+// POST: Signup route (Create)
 router.post('/', async (req, res) => {
-  const { firstName, lastName, email, phoneNumber, aadharNumber, panNumber, occupation, fullName } = req.body;
+  const { firstName, lastName, email, phoneNumber, aadharNumber } = req.body;
 
   // Validation
-  if (!firstName || !lastName || !email || !phoneNumber) {
-    return res.status(400).json({ message: 'First name, last name, email, and phone number are required.' });
+  if (!firstName || !lastName || !email || !phoneNumber || !aadharNumber) {
+    return res.status(400).json({ message: 'All fields are required' });
   }
 
   try {
@@ -18,18 +19,14 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Signup already exists with this email' });
     }
 
-    // Create new signup with optional fields
-    const signup = new Signup({ 
-      firstName, 
-      lastName, 
-      email, 
-      phoneNumber, 
-      aadharNumber, 
-      panNumber, 
-      occupation, 
-      fullName 
-    });
-    
+    // Check if aadharNumber already exists
+    const existingAadhar = await Signup.findOne({ aadharNumber });
+    if (existingAadhar) {
+      return res.status(400).json({ message: 'Aadhar number already exists' });
+    }
+
+    // Create new signup
+    const signup = new Signup({ firstName, lastName, email, phoneNumber, aadharNumber });
     await signup.save();
 
     res.status(201).json({ message: 'Signup registered successfully', signup });
@@ -38,7 +35,6 @@ router.post('/', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 // GET: Retrieve all signups (Read)
 router.get('/', async (req, res) => {
   try {
