@@ -1,4 +1,5 @@
-// Signup schema
+const mongoose = require('mongoose');
+
 const signupSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -25,3 +26,5 @@ const signupSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+module.exports = mongoose.model('Signup', signupSchema);
