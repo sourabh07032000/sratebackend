@@ -3,8 +3,9 @@ const router = express.Router();
 const Signup = require('../models/Signup');
 
 // POST: Signup route (Create)
-// POST: Signup route (Create)
 router.post('/', async (req, res) => {
+  console.log('Request Body:', req.body); // Log the request body
+
   const { firstName, lastName, email, phoneNumber, aadharNumber } = req.body;
 
   // Validation
@@ -13,13 +14,13 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    // Check if signup already exists
+    // Check for existing email
     const existingSignup = await Signup.findOne({ email });
     if (existingSignup) {
       return res.status(400).json({ message: 'Signup already exists with this email' });
     }
 
-    // Check if aadharNumber already exists
+    // Check for existing aadhar number
     const existingAadhar = await Signup.findOne({ aadharNumber });
     if (existingAadhar) {
       return res.status(400).json({ message: 'Aadhar number already exists' });
@@ -31,7 +32,7 @@ router.post('/', async (req, res) => {
 
     res.status(201).json({ message: 'Signup registered successfully', signup });
   } catch (error) {
-    console.error('Signup Error:', error);
+    console.error('Signup Error:', error.message); // Log the error message
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
