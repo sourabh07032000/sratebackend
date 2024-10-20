@@ -7,20 +7,20 @@ const signupSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: true, unique: true },
   
-  // KYC Information
-  aadharNumber: { type: String, required: true, unique: true },
-  panNumber: { type: String, required: true, unique: true },
-  occupation: { type: String, required: true },
-  fullName: { type: String, required: true },
-  nomineeName: { type: String },
-  nomineeRelation: { type: String },
-  nomineeAadharNumber: { type: String },
+  // KYC Information (Optional)
+  aadharNumber: { type: String, unique: true }, // Unique but not required
+  panNumber: { type: String, unique: true }, // Unique but not required
+  occupation: { type: String }, // Optional
+  fullName: { type: String }, // Optional
+  nomineeName: { type: String }, // Optional
+  nomineeRelation: { type: String }, // Optional
+  nomineeAadharNumber: { type: String }, // Optional
   
-  // Photo URLs
-  selfie: { type: String, required: true }, // URL for Selfie photo
-  panPhoto: { type: String, required: true }, // URL for PAN photo
-  aadharFrontPhoto: { type: String, required: true }, // URL for Aadhar Front photo
-  aadharBackPhoto: { type: String, required: true }, // URL for Aadhar Back photo
+  // Photo URLs (Optional)
+  selfie: { type: String }, // URL for Selfie photo (Optional)
+  panPhoto: { type: String }, // URL for PAN photo (Optional)
+  aadharFrontPhoto: { type: String }, // URL for Aadhar Front photo (Optional)
+  aadharBackPhoto: { type: String }, // URL for Aadhar Back photo (Optional)
   
   // Verification Status
   kycVerified: { type: Boolean, default: false },
@@ -29,3 +29,4 @@ const signupSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Signup', signupSchema);
+
