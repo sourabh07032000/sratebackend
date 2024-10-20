@@ -17,7 +17,7 @@ router.post('/send-otp', (req, res) => {
 
   // Validate phone number (basic validation)
   if (!phoneNumber ) {
-    return res.status(400).json({ success: false, message: 'Invalid phone number' });
+    return res.status(400).json({ success: false, message: 'Invalid phone number', phoneNumber });
   }
 
   const otp = generateOTP();
