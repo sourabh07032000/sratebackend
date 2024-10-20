@@ -25,6 +25,3 @@ const signupSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-
-
