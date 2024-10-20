@@ -39,7 +39,7 @@ router.post('/send-otp', (req, res) => {
       res.status(200).json({ success: true, message: 'OTP sent' });
     })
     .catch(error => {
-      console.error('Error sending OTP via Twilio:', error.message);
+      console.error('Error sending OTP via Twilio:', process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN, error.message);
       res.status(500).json({ success: false, message: 'Error sending OTP', details: error.message });
     });
 });
