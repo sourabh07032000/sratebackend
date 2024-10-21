@@ -15,13 +15,13 @@ app.use(express.json());
 const signupRoutes = require('./routes/signup'); // Adjust the path as needed
 const otpRoutes = require('./routes/otp');
 const plan = require('./routes/plan');
-const investment = require('./routes/investment');
+
 
 // Use signup and OTP routes
 app.use('/signup', signupRoutes);
 app.use('/api', otpRoutes);
 app.use('/plan', plan);
-app.use('/investment', investment);
+
 
 // Connect to MongoDB using the correct URI
 mongoose.connect(process.env.MONGO_URI, {
