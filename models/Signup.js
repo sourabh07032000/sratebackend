@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Define the schema for signup including investment details
 const signupSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -23,6 +24,13 @@ const signupSchema = new mongoose.Schema({
   
   // Verification Status
   kycVerified: { type: Boolean, default: false },
+  
+  // Investments (Array)
+  investments: [{
+    planId: { type: String, required: true }, // Plan ID or name of the investment plan
+    amount: { type: Number, required: true }, // Amount invested
+    investmentDate: { type: Date, default: Date.now } // Date of investment
+  }],
 }, {
   timestamps: true
 });
