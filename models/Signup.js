@@ -27,7 +27,7 @@ const signupSchema = new mongoose.Schema({
   
   // Investments (Array)
   investments: [{
-    planId: { type: String, required: true }, // Plan ID or name of the investment plan
+    planId: { type: Object, required: true }, // Plan ID or name of the investment plan
     amount: { type: Number, required: true }, // Amount invested
     investmentDate: { type: Date, default: Date.now } // Date of investment
   }],
