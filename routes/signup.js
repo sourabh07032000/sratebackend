@@ -54,7 +54,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// PUT: Update a signup by ID with KYC information
+// PUT: Update signup by ID with KYC and Investment Information
 router.put('/:id', async (req, res) => {
   const { 
     aadharNumber, 
@@ -67,11 +67,12 @@ router.put('/:id', async (req, res) => {
     selfie, 
     panPhoto, 
     aadharFrontPhoto, 
-    aadharBackPhoto 
+    aadharBackPhoto,
+    investments // This will be an array of investments 
   } = req.body;
 
   try {
-    // Find the signup by ID and update it with the KYC information
+    // Find the signup by ID and update it
     const updatedSignup = await Signup.findByIdAndUpdate(
       req.params.id, 
       { 
@@ -85,7 +86,8 @@ router.put('/:id', async (req, res) => {
         selfie, 
         panPhoto, 
         aadharFrontPhoto, 
-        aadharBackPhoto 
+        aadharBackPhoto,
+        $push: { investments: { $each: investments } } // Push investments into the array
       }, 
       { new: true } // Return the updated document
     );
