@@ -15,7 +15,7 @@ app.use(express.json());
 const signupRoutes = require('./routes/signup'); // Adjust the path as needed
 const otpRoutes = require('./routes/otp');
 const plan = require('./routes/plan');
-const plan = require('./routes/investment');
+const investment = require('./routes/investment');
 
 // Use signup and OTP routes
 app.use('/signup', signupRoutes);
