@@ -1,35 +1,41 @@
 // routes/cashfreeRoutes.js
-
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 
-// Webhook route to handle Cashfree notifications
-router.post('/webhook/cashfree', (req, res) => {
-    const webhookData = req.body;
+router.post('/webhook/cashfree', async (req, res) => {
+    const { order_id, order_amount, order_currency, customer_details, order_note, order_meta, version } = req.body;
 
-    // Log the webhook data
-    console.log('Cashfree Webhook Received:', webhookData);
-
-    // Handle the webhook data based on the event type
-    switch (webhookData.event) {
-        case 'PAYMENT_SUCCESS':
-            // Handle successful payment
-            console.log('Payment Successful:', webhookData);
-            break;
-
-        case 'PAYMENT_FAILED':
-            // Handle failed payment
-            console.log('Payment Failed:', webhookData);
-            break;
-
-        // Add more cases for different events as needed
-
-        default:
-            console.log('Unknown Event:', webhookData);
+    // Validate input data as necessary
+    if (!order_id || !order_amount || !customer_details) {
+        return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Respond with a 200 status to acknowledge receipt of the webhook
-    res.status(200).send('Webhook received');
+    const data = {
+        order_id,
+        order_amount,
+        order_currency,
+        customer_details,
+        order_note,
+        order_meta,
+        version,
+    };
+
+    try {
+        // Make request to Cashfree API
+        const response = await axios.post('https://api.cashfree.com/api/v2/cashfree', data, {
+            headers: {
+                'x-client-id': process.env.CASHFREE_CLIENT_ID, // Use environment variables for sensitive info
+                'x-client-secret': process.env.CASHFREE_CLIENT_SECRET,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.error('Error while creating order:', error.response.data);
+        return res.status(500).json({ message: 'Failed to create order', error: error.response.data });
+    }
 });
 
 module.exports = router;
