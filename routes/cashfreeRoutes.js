@@ -1,67 +1,42 @@
-// routes/cashfreeRoutes.js
+// cashfree.js
 const express = require('express');
-const https = require('https'); // Import the https module
 const router = express.Router();
+const axios = require('axios');
 
-router.post('/webhook/cashfree', (req, res) => {
-    const { order_id, order_amount, order_currency, customer_details, order_note, order_meta, version } = req.body;
+const CASHFREE_CLIENT_ID = "TEST1033604142c07ce9bd2c017b30dc14063301"; // Replace with your client ID
+const CASHFREE_CLIENT_SECRET = "cfsk_ma_test_b7d047e94e267dda8ad8b384c88d3ea7_3ef0727b"; // Replace with your secret key
+const CASHFREE_ENVIRONMENT = "sandbox"; // Use "sandbox" or "production"
 
-    // Validate input data as necessary
-    if (!order_id || !order_amount || !customer_details) {
-        return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const data = JSON.stringify({
-        order_id,
-        order_amount,
-        order_currency,
-        customer_details,
-        order_note,
-        order_meta,
-        version,
-    });
-
-    const options = {
-        hostname: 'api.cashfree.com', // Cashfree API hostname
-        path: '/api/v2/cashfree', // API endpoint path
-        method: 'POST',
-        headers: {
-            'x-client-id': process.env.CASHFREE_CLIENT_ID, // Use environment variables for sensitive info
-            'x-client-secret': process.env.CASHFREE_CLIENT_SECRET,
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(data),
+// Create an order endpoint
+router.post('/create-order', async (req, res) => {
+    const request = {
+        order_amount: req.body.order_amount,
+        order_currency: "INR",
+        order_id: `devstudio_${new Date().getTime()}`, // Unique order ID
+        customer_details: {
+            customer_id: req.body.customer_id,
+            customer_phone: req.body.customer_phone,
+            customer_email: req.body.customer_email // Optional
         },
+        order_meta: {
+            return_url: req.body.return_url
+        }
     };
 
-    const request = https.request(options, (response) => {
-        let responseData = '';
-
-        // Collect the response data
-        response.on('data', (chunk) => {
-            responseData += chunk;
-        });
-
-        // End of response
-        response.on('end', () => {
-            try {
-                const parsedResponse = JSON.parse(responseData);
-                return res.status(response.statusCode).json(parsedResponse);
-            } catch (error) {
-                console.error('Error parsing response:', error);
-                return res.status(500).json({ message: 'Failed to parse response' });
+    try {
+        const response = await axios.post(`https://api.cashfree.com/api/v1/order/create`, request, {
+            headers: {
+                'X-Client-Id': CASHFREE_CLIENT_ID,
+                'X-Client-Secret': CASHFREE_CLIENT_SECRET,
+                'Content-Type': 'application/json'
             }
         });
-    });
 
-    // Handle request errors
-    request.on('error', (error) => {
-        console.error('Error during request:', error);
-        return res.status(500).json({ message: 'Failed to create order', error: error.message });
-    });
-
-    // Write the data to request body
-    request.write(data);
-    request.end();
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.error('Error creating Cashfree order:', error.response ? error.response.data : error.message);
+        return res.status(500).json({ error: 'Error creating Cashfree order' });
+    }
 });
 
 module.exports = router;
