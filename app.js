@@ -23,7 +23,7 @@ const plan = require('./routes/plan');
 app.use('/signup', signupRoutes);
 app.use('/api', otpRoutes);
 app.use('/plan', plan);
-app.use(cashfreeRoutes);
+app.use('/webhook', cashfreeRoutes);
 
 
 
