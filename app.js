@@ -2,6 +2,8 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cashfreeRoutes = require('./routes/cashfreeRoutes'); // Adjust path as necessary
+
 
 const app = express();
 
@@ -21,6 +23,8 @@ const plan = require('./routes/plan');
 app.use('/signup', signupRoutes);
 app.use('/api', otpRoutes);
 app.use('/plan', plan);
+app.use(cashfreeRoutes);
+
 
 
 // Connect to MongoDB using the correct URI
