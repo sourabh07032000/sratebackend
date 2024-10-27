@@ -1,67 +1,33 @@
-// routes/cashfreeRoutes.js
-const express = require('express');
-const https = require('https'); // Import the https module
-const router = express.Router();
+// cashfreeRoutes.js
+import { Cashfree } from "cashfree-pg"; // Ensure you have cashfree-pg installed
 
-router.post('/webhook/cashfree', (req, res) => {
-    const { order_id, order_amount, order_currency, customer_details, order_note, order_meta, version } = req.body;
+// Set up Cashfree configuration
+Cashfree.XClientId = "TEST1033604142c07ce9bd2c017b30dc14063301"; // Replace with your client ID
+Cashfree.XClientSecret = "cfsk_ma_test_b7d047e94e267dda8ad8b384c88d3ea7_3ef0727b"; // Replace with your secret key
+Cashfree.XEnvironment = Cashfree.Environment.SANDBOX; // Use .SANDBOX or .PRODUCTION as needed
 
-    // Validate input data as necessary
-    if (!order_id || !order_amount || !customer_details) {
-        return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const data = JSON.stringify({
-        order_id,
-        order_amount,
-        order_currency,
-        customer_details,
-        order_note,
-        order_meta,
-        version,
-    });
-
-    const options = {
-        hostname: 'api.cashfree.com', // Cashfree API hostname
-        path: '/api/v2/cashfree', // API endpoint path
-        method: 'POST',
-        headers: {
-            'x-client-id': process.env.CASHFREE_CLIENT_ID, // Use environment variables for sensitive info
-            'x-client-secret': process.env.CASHFREE_CLIENT_SECRET,
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(data),
+// Function to create an order
+export const createCashfreeOrder = async () => {
+    const request = {
+        "order_amount": 10.00,
+        "order_currency": "INR",
+        "order_id": "devstudio_" + new Date().getTime(), // Unique order ID
+        "customer_details": {
+            "customer_id": "devstudio_user",
+            "customer_phone": "8878084604",
+            "customer_email": "example@gmail.com" // Include email if needed
         },
+        "order_meta": {
+            "return_url": "https://www.cashfree.com/devstudio/preview/pg/mobile/hybrid?order_id={order_id}"
+        }
     };
 
-    const request = https.request(options, (response) => {
-        let responseData = '';
-
-        // Collect the response data
-        response.on('data', (chunk) => {
-            responseData += chunk;
-        });
-
-        // End of response
-        response.on('end', () => {
-            try {
-                const parsedResponse = JSON.parse(responseData);
-                return res.status(response.statusCode).json(parsedResponse);
-            } catch (error) {
-                console.error('Error parsing response:', error);
-                return res.status(500).json({ message: 'Failed to parse response' });
-            }
-        });
-    });
-
-    // Handle request errors
-    request.on('error', (error) => {
-        console.error('Error during request:', error);
-        return res.status(500).json({ message: 'Failed to create order', error: error.message });
-    });
-
-    // Write the data to request body
-    request.write(data);
-    request.end();
-});
-
-module.exports = router;
+    try {
+        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        console.log('Order created successfully:', response.data);
+        return response.data; // Return order data for further use
+    } catch (error) {
+        console.error('Error creating order:', error.response.data.message);
+        throw error; // Throw error for handling in the component
+    }
+};
