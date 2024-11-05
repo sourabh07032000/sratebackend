@@ -23,7 +23,7 @@ const plan = require('./routes/plan');
 app.use('/signup', signupRoutes);
 app.use('/api', otpRoutes);
 app.use('/plan', plan);
-app.use('/api/cashfree', cashfreeRoutes);
+app.use('/cashfree', cashfreeRoutes); // Cashfree routes ko `/cashfree` prefix ke saath mount kar rahe hain
 
 
 
