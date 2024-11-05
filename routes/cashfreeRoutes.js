@@ -21,13 +21,13 @@ router.post('/create-order', async (req, res) => {
   };
 
   const headers = {
-    'Authorization': 'Bearer YOUR_SECRET_KEY',  // Replace with your actual secret key
+    'Authorization': 'cfsk_ma_prod_ae9ddae7aa0bf21a2a4d37f69ece76e1_1e167998',  // Replace with your actual secret key
     'Content-Type': 'application/json',
-    'x-client-id': 'YOUR_APP_ID'  // Replace with your actual app ID
+    'x-client-id': '78648954e1c85af916de5b9197984687'  // Replace with your actual app ID
   };
 
   try {
-    const response = await axios.post('https://sandbox.cashfree.com/pg/orders', data, { headers });
+    const response = await axios.post('https://api.cashfree.com/pg/orders', data, { headers });
     console.log("Order Created:", response.data);
     res.status(200).json(response.data);
   } catch (error) {
