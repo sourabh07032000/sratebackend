@@ -10,29 +10,33 @@ router.post('/create-order', async (req, res) => {
     order_currency: 'INR',
     customer_details,
     order_meta: {
-      return_url: 'https://yourapp.com/return', // Adjust with your return URL
+      return_url: 'https://yourapp.com/return', // Replace with your actual return URL
     },
   };
 
   try {
-    const response = await fetch('https://api.cashfree.com/api/v2/order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-client-id': '78648954e1c85af916de5b9197984687',
-        'x-client-secret': 'cfsk_ma_prod_ae9ddae7aa0bf21a2a4d37f69ece76e1_1e167998',
-      },
-      body: JSON.stringify(orderData),
-    });
+    const response = await axios.post(
+      'https://api.cashfree.com/api/v2/order',
+      orderData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-client-id': process.env.CASHFREE_CLIENT_ID, // Store these in .env
+          'x-client-secret': process.env.CASHFREE_CLIENT_SECRET,
+        },
+      }
+    );
 
-    const data = await response.json();
+    const data = response.data;
 
     if (data.status === 'OK') {
       res.json({ order_token: data.order_token, order_id: data.order_id });
     } else {
-      res.status(500).json({ error: 'Order creation failed' });
+      console.error('Order Creation Failed:', data);
+      res.status(500).json({ error: data.message || 'Order creation failed' });
     }
   } catch (error) {
+    console.error('Server Error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
