@@ -17,7 +17,7 @@ router.post('/create-order', async (req, res) => {
 
   try {
     const response = await axios.post(
-      'https://api.cashfree.com/api/v2/order',
+      'https://api.cashfree.com/api/v2/order/create',
       orderData,
       {
         headers: {
