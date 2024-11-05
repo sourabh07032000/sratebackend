@@ -19,8 +19,8 @@ router.post('/create-order', async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-client-id': 'YOUR_CLIENT_ID',
-        'x-client-secret': 'YOUR_CLIENT_SECRET',
+        'x-client-id': '78648954e1c85af916de5b9197984687',
+        'x-client-secret': 'cfsk_ma_prod_ae9ddae7aa0bf21a2a4d37f69ece76e1_1e167998',
       },
       body: JSON.stringify(orderData),
     });
