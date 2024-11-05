@@ -18,7 +18,7 @@ router.post('/create-order', async (req, res) => {
 
   try {
     const response = await axios.post(
-      'https://sandbox.cashfree.com/pg/orders', // Use the correct environment URL
+      'https://api.cashfree.com/pg/orders', // Use the correct environment URL
       orderData,
       {
         headers: {
