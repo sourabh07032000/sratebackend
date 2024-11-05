@@ -1,7 +1,3 @@
-const express = require('express');
-const axios = require('axios');
-const router = express.Router();
-
 router.post('/create-order', async (req, res) => {
   const { order_amount, customer_details } = req.body;
 
@@ -21,7 +17,7 @@ router.post('/create-order', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-client-id': process.env.CASHFREE_CLIENT_ID, // Store these in .env
+          'x-client-id': process.env.CASHFREE_CLIENT_ID,
           'x-client-secret': process.env.CASHFREE_CLIENT_SECRET,
         },
       }
@@ -36,9 +32,7 @@ router.post('/create-order', async (req, res) => {
       res.status(500).json({ error: data.message || 'Order creation failed' });
     }
   } catch (error) {
-    console.error('Server Error:', error);
+    console.error('Server Error:', error.response ? error.response.data : error.message); // Log the error
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-module.exports = router;
