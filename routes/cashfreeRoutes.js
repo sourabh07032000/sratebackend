@@ -1,4 +1,3 @@
-
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
@@ -10,6 +9,7 @@ router.post('/create-payment-link', async (req, res) => {
     link_id: `link_${Date.now()}`, // Generate a unique link ID if required
     link_amount: order_amount,
     link_currency: 'INR',
+    link_purpose: 'Investment Payment', // Add a purpose for the payment link
     customer_details,
     link_meta: {
       return_url: 'https://yourapp.com/return', // Replace with your actual return URL
@@ -50,5 +50,3 @@ router.post('/create-payment-link', async (req, res) => {
 });
 
 module.exports = router;
-
-
