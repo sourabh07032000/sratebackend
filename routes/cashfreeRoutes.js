@@ -22,7 +22,7 @@ router.post('/create-payment-link', async (req, res) => {
 
   try {
     const response = await axios.post(
-      'https://api.cashfree.com/pg/links', // Payment Links API endpoint
+      'https://api.cashfree.com/pg/orders', // Payment Links API endpoint
       linkData,
       {
         headers: {
