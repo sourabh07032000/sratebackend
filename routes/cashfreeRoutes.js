@@ -2,28 +2,24 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
-router.post('/create-payment-link', async (req, res) => {
+
+router.post('/create-order', async (req, res) => {
   const { order_amount, customer_details } = req.body;
 
-  const linkData = {
-    link_id: `link_${Date.now()}`, // Generate a unique link ID if required
-    link_amount: order_amount,
-    link_currency: 'INR',
-    link_purpose: 'Investment Payment', // Add a purpose for the payment link
+  const orderData = {
+    order_id: `order_${Date.now()}`,  // Generate a unique order ID
+    order_amount,
+    order_currency: 'INR',
     customer_details,
-    link_meta: {
+    order_meta: {
       return_url: 'https://yourapp.com/return', // Replace with your actual return URL
     },
-    link_notify: {
-      send_sms: true, // Optional: Send SMS notification
-      send_email: true, // Optional: Send email notification
-    }
   };
 
   try {
     const response = await axios.post(
-      'https://api.cashfree.com/pg/orders', // Payment Links API endpoint
-      linkData,
+      'https://api.cashfree.com/pg/orders', // Use the correct environment URL
+      orderData,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -36,17 +32,19 @@ router.post('/create-payment-link', async (req, res) => {
 
     const data = response.data;
 
-    if (data.status === 'OK' && data.link_status === 'ACTIVE') {
-      // Send the payment link to the frontend
-      res.json({ payment_link: data.link_url, link_id: data.link_id });
+    if (data.order_status === 'ACTIVE') {
+      // Send the payment session ID and order ID to the frontend
+      res.json({ payment_session_id: data.payment_session_id, order_id: data.order_id });
     } else {
-      console.error('Payment Link Creation Failed:', data);
-      res.status(500).json({ error: 'Payment link creation failed' });
+      console.error('Order Creation Failed:', data);
+      res.status(500).json({ error: 'Order creation failed' });
     }
   } catch (error) {
     console.error('Server Error:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
 
 module.exports = router;
