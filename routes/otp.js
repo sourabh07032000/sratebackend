@@ -25,7 +25,7 @@ router.post('/send-otp', (req, res) => {
 
   client.messages
       .create({
-          body: `Your OTP is ${otp}`,
+          body: `${otp} is verification code - Sarte Assets Mining`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: phoneNumber // Use the dynamic phone number from request
       })
