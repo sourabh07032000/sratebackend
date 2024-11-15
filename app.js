@@ -24,7 +24,7 @@ cost feedback = requires('/routes/feedback')
 app.use('/signup', signupRoutes);
 app.use('/api', otpRoutes);
 app.use('/plan', plan);
-app.use('/feedback,feedback);
+app.use('/feedback',feedback);
 app.use('/cashfree', cashfreeRoutes); // Cashfree routes ko `/cashfree` prefix ke saath mount kar rahe hain
 
 
