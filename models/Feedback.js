@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const FeedbackSchema = new mongoose.Schema({
   name : String,
   email : String,
-  phoneNumber : Number,
+  phoneNumber : String,
   message : String,
 
 });
