@@ -6,6 +6,7 @@ const FeedbackSchema = new mongoose.Schema({
   email : String,
   phoneNumber : String,
   message : String,
+  referBy: String,
 
 });
 
