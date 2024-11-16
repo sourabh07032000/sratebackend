@@ -75,15 +75,9 @@ router.put('/:id', async (req, res) => {
 
   try {
     // Validate investments
-    if (investments && !Array.isArray(investments)) {
-      return res.status(400).json({ message: 'Investments must be an array' });
-    }
+   
 
     // Ensure investments field is an array in the document
-    await Signup.updateOne(
-      { _id: req.params.id },
-      { $set: { investments: { $ifNull: ["$investments", []] } } }
-    );
 
     // Perform the update
     const updatedSignup = await Signup.findByIdAndUpdate(
@@ -102,7 +96,7 @@ router.put('/:id', async (req, res) => {
         panPhoto, 
         aadharFrontPhoto, 
         aadharBackPhoto,
-        ...(investments ? { $push: { investments: { $each: investments } } } : {}) // Push investments if provided
+        investments // Push investments if provided
       }, 
       { new: true } // Return the updated document
     );
