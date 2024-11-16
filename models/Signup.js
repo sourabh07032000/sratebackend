@@ -34,6 +34,7 @@ const signupSchema = new mongoose.Schema({
 
    // Transactions (Array)
   transactions: [{
+    userId : {type : String, required : true},
     name: { type: String, required: true }, // Unique ID for transaction
     amount: { type: Number, required: true }, // Amount of the transaction
     status: { type: String, enum: ['Pending', 'Completed', 'Failed'], default: 'Pending' }, // Transaction status
