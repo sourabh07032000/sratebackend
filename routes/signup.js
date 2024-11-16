@@ -57,6 +57,7 @@ router.get('/:id', async (req, res) => {
 // PUT: Update signup by ID with KYC and Investment Information
 router.put('/:id', async (req, res) => {
   const { 
+    kycVerified,
     aadharNumber, 
     panNumber, 
     occupation, 
@@ -94,7 +95,8 @@ router.put('/:id', async (req, res) => {
         nomineeName, 
         nomineeRelation, 
         nomineeAadharNumber, 
-        selfie, 
+        selfie,
+        kycVerified,
         panPhoto, 
         aadharFrontPhoto, 
         aadharBackPhoto,
