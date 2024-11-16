@@ -66,7 +66,8 @@ router.put('/:id', async (req, res) => {
     nomineeRelation, 
     nomineeAadharNumber, 
     selfie, 
-    panPhoto, 
+    panPhoto,
+    transactions,
     aadharFrontPhoto, 
     aadharBackPhoto,
     investments // This should be an array
@@ -97,6 +98,7 @@ router.put('/:id', async (req, res) => {
         nomineeAadharNumber, 
         selfie,
         kycVerified,
+        transactions,
         panPhoto, 
         aadharFrontPhoto, 
         aadharBackPhoto,
