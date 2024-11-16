@@ -71,45 +71,50 @@ router.put('/:id', async (req, res) => {
     aadharFrontPhoto,
     aadharBackPhoto,
     transactions,
-    investments, // This should be an array
+    investments, // Should be an array
   } = req.body;
 
+  const mongoose = require('mongoose');
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: 'Invalid ID format' });
+  }
+
   try {
-    // Find the existing signup record
+    // Find the existing record
     const signup = await Signup.findById(req.params.id);
     if (!signup) {
       return res.status(404).json({ message: 'Signup not found' });
     }
 
-    // Ensure investments is an array and merge with existing
+    // Validate and merge investments
     const updatedInvestments = Array.isArray(investments)
       ? [...(signup.investments || []), ...investments]
       : signup.investments;
 
-    // Prepare update object
+    // Prepare update data
     const updateData = {
-      kycVerified,
-      aadharNumber,
-      panNumber,
-      occupation,
-      fullName,
-      nomineeName,
-      bankDetails,
-      nomineeRelation,
-      nomineeAadharNumber,
-      selfie,
-      panPhoto,
-      aadharFrontPhoto,
-      aadharBackPhoto,
-      transactions,
-      investments: updatedInvestments, // Use merged investments
+      ...(kycVerified !== undefined && { kycVerified }),
+      ...(aadharNumber && { aadharNumber }),
+      ...(panNumber && { panNumber }),
+      ...(occupation && { occupation }),
+      ...(fullName && { fullName }),
+      ...(nomineeName && { nomineeName }),
+      ...(bankDetails && { bankDetails }),
+      ...(nomineeRelation && { nomineeRelation }),
+      ...(nomineeAadharNumber && { nomineeAadharNumber }),
+      ...(selfie && { selfie }),
+      ...(panPhoto && { panPhoto }),
+      ...(aadharFrontPhoto && { aadharFrontPhoto }),
+      ...(aadharBackPhoto && { aadharBackPhoto }),
+      ...(transactions && { transactions }),
+      investments: updatedInvestments,
     };
 
-    // Perform the update
+    // Update the record
     const updatedSignup = await Signup.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true } // Return the updated document
+      { new: true } // Return updated document
     );
 
     res.status(200).json({ message: 'Signup updated successfully', updatedSignup });
