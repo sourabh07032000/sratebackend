@@ -31,6 +31,16 @@ const signupSchema = new mongoose.Schema({
     amount: { type: Number, required: true }, // Amount invested
     investmentDate: { type: Date, default: Date.now } // Date of investment
   }],
+
+   // Transactions (Array)
+  transactions: [{
+    name: { type: String, required: true }, // Unique ID for transaction
+    amount: { type: Number, required: true }, // Amount of the transaction
+    status: { type: String, enum: ['Pending', 'Completed', 'Failed'], default: 'Pending' }, // Transaction status
+    date: { type: Date, default: Date.now }, // Date of transaction
+    utrNumber: { type: String }, // Optional: UTR number or reference for manual payments
+    paymentScreenshot: { type: String } // Optional: Screenshot URL for payment proof
+  }],
 }, {
   timestamps: true
 });
