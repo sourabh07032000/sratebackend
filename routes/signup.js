@@ -56,54 +56,59 @@ router.get('/:id', async (req, res) => {
 
 // PUT: Update signup by ID with KYC and Investment Information
 router.put('/:id', async (req, res) => {
-  const { 
+  const {
     kycVerified,
-    aadharNumber, 
-    panNumber, 
-    occupation, 
-    fullName, 
-    nomineeName, 
-    nomineeRelation, 
-    nomineeAadharNumber, 
-    selfie, 
+    aadharNumber,
+    panNumber,
+    occupation,
+    fullName,
+    nomineeName,
+    nomineeRelation,
+    nomineeAadharNumber,
+    selfie,
     panPhoto,
-    transactions,
-    aadharFrontPhoto, 
+    aadharFrontPhoto,
     aadharBackPhoto,
-    investments // This should be an array
+    transactions,
+    investments, // This should be an array
   } = req.body;
 
   try {
-    // Validate investments
-   
+    // Find the existing signup record
+    const signup = await Signup.findById(req.params.id);
+    if (!signup) {
+      return res.status(404).json({ message: 'Signup not found' });
+    }
 
-    // Ensure investments field is an array in the document
+    // Ensure investments is an array and merge with existing
+    const updatedInvestments = Array.isArray(investments)
+      ? [...(signup.investments || []), ...investments]
+      : signup.investments;
+
+    // Prepare update object
+    const updateData = {
+      kycVerified,
+      aadharNumber,
+      panNumber,
+      occupation,
+      fullName,
+      nomineeName,
+      nomineeRelation,
+      nomineeAadharNumber,
+      selfie,
+      panPhoto,
+      aadharFrontPhoto,
+      aadharBackPhoto,
+      transactions,
+      investments: updatedInvestments, // Use merged investments
+    };
 
     // Perform the update
     const updatedSignup = await Signup.findByIdAndUpdate(
-      req.params.id, 
-      { 
-        aadharNumber, 
-        panNumber, 
-        occupation, 
-        fullName, 
-        nomineeName, 
-        nomineeRelation, 
-        nomineeAadharNumber, 
-        selfie,
-        kycVerified,
-        transactions,
-        panPhoto, 
-        aadharFrontPhoto, 
-        aadharBackPhoto,
-        investments // Push investments if provided
-      }, 
+      req.params.id,
+      updateData,
       { new: true } // Return the updated document
     );
-
-    if (!updatedSignup) {
-      return res.status(404).json({ message: 'Signup not found' });
-    }
 
     res.status(200).json({ message: 'Signup updated successfully', updatedSignup });
   } catch (error) {
