@@ -15,6 +15,8 @@ const signupSchema = new mongoose.Schema({
   nomineeName: { type: String }, // Optional
   nomineeRelation: { type: String }, // Optional
   nomineeAadharNumber: { type: String }, // Optional
+
+  bankDetails : {type: Object  },
   
   // Photo URLs (Optional)
   selfie: { type: String }, // URL for Selfie photo (Optional)
