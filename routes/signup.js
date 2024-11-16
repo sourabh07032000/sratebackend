@@ -68,11 +68,22 @@ router.put('/:id', async (req, res) => {
     panPhoto, 
     aadharFrontPhoto, 
     aadharBackPhoto,
-    investments // This will be an array of investments 
+    investments // This should be an array
   } = req.body;
 
   try {
-    // Find the signup by ID and update it
+    // Validate investments
+    if (investments && !Array.isArray(investments)) {
+      return res.status(400).json({ message: 'Investments must be an array' });
+    }
+
+    // Ensure investments field is an array in the document
+    await Signup.updateOne(
+      { _id: req.params.id },
+      { $set: { investments: { $ifNull: ["$investments", []] } } }
+    );
+
+    // Perform the update
     const updatedSignup = await Signup.findByIdAndUpdate(
       req.params.id, 
       { 
@@ -87,7 +98,7 @@ router.put('/:id', async (req, res) => {
         panPhoto, 
         aadharFrontPhoto, 
         aadharBackPhoto,
-        $push: { investments: { $each: investments } } // Push investments into the array
+        ...(investments ? { $push: { investments: { $each: investments } } } : {}) // Push investments if provided
       }, 
       { new: true } // Return the updated document
     );
@@ -102,6 +113,7 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 
 // DELETE: Remove a signup by ID
 router.delete('/:id', async (req, res) => {
