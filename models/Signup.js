@@ -31,7 +31,11 @@ const signupSchema = new mongoose.Schema({
   investments: [{
     planId: { type: Object, required: true }, // Plan ID or name of the investment plan
     amount: { type: Number, required: true }, // Amount invested
-    investmentDate: { type: Date, default: Date.now } // Date of investment
+    investmentDate: { type: Date, default: Date.now }, // Date of investment
+    lastProfitUpdate: { type: Date, required: true }, // When profit was last updated
+    dailyProfit: { type: Number, required: true }, // Profit per day
+    totalProfit: { type: Number, default: 0 }, // Accumulated profit
+
   }],
 
    // Transactions (Array)
