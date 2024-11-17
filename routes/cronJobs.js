@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const Signup = require('./models/Signup');
+const Signup = require('../models/Signup');
 
 // Function to update profits
 const updateDailyProfits = async () => {
