@@ -35,6 +35,7 @@ const signupSchema = new mongoose.Schema({
     lastProfitUpdate: { type: Date, required: true }, // When profit was last updated
     dailyProfit: { type: Number, required: true }, // Profit per day
     totalProfit: { type: Number, default: 0 }, // Accumulated profit
+    monthlyProfit : {type: Number, default: 0}
 
   }],
 
