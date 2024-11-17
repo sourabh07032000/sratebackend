@@ -2,6 +2,42 @@ const express = require('express');
 const router = express.Router();
 const Signup = require('../models/Signup');
 
+router.post('/:id/investments', async (req, res) => {
+  const { planId, amount, dailyProfit } = req.body;
+
+  if (!planId || !amount || !dailyProfit) {
+    return res.status(400).json({ message: 'Plan ID, amount, and daily profit are required' });
+  }
+
+  try {
+    const user = await Signup.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const now = new Date();
+
+    // Add the new investment
+    const newInvestment = {
+      planId,
+      amount,
+      dailyProfit,
+      investmentDate: now,
+      lastProfitUpdate: now,
+      totalProfit: 0,
+    };
+
+    user.investments.push(newInvestment);
+    await user.save();
+
+    res.status(201).json({ message: 'Investment added successfully', investment: newInvestment });
+  } catch (error) {
+    console.error('Error adding investment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
 // POST: Signup route (Create)
 router.post('/', async (req, res) => {
   const { firstName, lastName, email, phoneNumber } = req.body;
