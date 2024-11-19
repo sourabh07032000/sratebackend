@@ -214,27 +214,38 @@ router.delete('/:userId/investments/:investmentId', async (req, res) => {
   try {
     const { userId, investmentId } = req.params;
 
+    // Validate IDs
+    if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(investmentId)) {
+      return res.status(400).json({ message: 'Invalid user ID or investment ID format' });
+    }
+
     // Find the user by ID
     const user = await Signup.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Find the specific investment by ID and remove it
-    const investment = user.investments.id(investmentId);
-    if (!investment) {
+    // Filter out the investment to delete
+    const investmentExists = user.investments.some((inv) => inv._id.toString() === investmentId);
+    if (!investmentExists) {
       return res.status(404).json({ message: 'Investment not found' });
     }
 
-    investment.remove(); // Mongoose method to remove subdocument
-    await user.save(); // Save the updated user document
+    user.investments = user.investments.filter((inv) => inv._id.toString() !== investmentId);
 
-    res.status(200).json({ message: 'Investment deleted successfully', investments: user.investments });
+    // Save the updated user document
+    await user.save();
+
+    res.status(200).json({
+      message: 'Investment deleted successfully',
+      investments: user.investments,
+    });
   } catch (error) {
     console.error('Error deleting investment:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 
 
 
