@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Signup = require('../models/Signup');
+const mongoose = require('mongoose');
 
 router.post('/:id/investments', async (req, res) => {
   const { planId, amount, dailyProfit } = req.body;
@@ -210,23 +211,46 @@ router.put('/:userId/investments/:investmentId', async (req, res) => {
   }
 });
 
-router.delete('/:userId/investments/:investmentId', async (req, res) => {
-  try {
-    const signup = await Signup.findByIdAndDelete(req.params.id);
-    if (!signup) {
-      return res.status(404).json({ message: 'Signup not found' });
-    }
-    res.status(200).json({ message: 'Signup deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting signup:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+
 
 
 // DELETE: Remove a specific investment by user ID and investment ID
 
+router.delete('/:userId/investments/:investmentId', async (req, res) => {
+  try {
+    const { userId, investmentId } = req.params;
 
+    // Validate IDs
+    if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(investmentId)) {
+      return res.status(400).json({ message: 'Invalid user ID or investment ID format' });
+    }
+
+    // Find the user by ID
+    const user = await Signup.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Filter out the investment to delete
+    const investmentExists = user.investments.some((inv) => inv._id.toString() === investmentId);
+    if (!investmentExists) {
+      return res.status(404).json({ message: 'Investment not found' });
+    }
+
+    user.investments = user.investments.filter((inv) => inv._id.toString() !== investmentId);
+
+    // Save the updated user document
+    await user.save();
+
+    res.status(200).json({
+      message: 'Investment deleted successfully',
+      investments: user.investments,
+    });
+  } catch (error) {
+    console.error('Error deleting investment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
 
 
 
