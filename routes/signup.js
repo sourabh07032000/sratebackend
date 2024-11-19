@@ -176,4 +176,38 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// PUT: Update specific investment by user ID and investment ID
+router.put('/:userId/investments/:investmentId', async (req, res) => {
+  const { planId, amount, dailyProfit, monthlyProfit, totalProfit } = req.body;
+
+  try {
+    const user = await Signup.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Find the specific investment by ID
+    const investment = user.investments.id(req.params.investmentId);
+    if (!investment) {
+      return res.status(404).json({ message: 'Investment not found' });
+    }
+
+    // Update the investment fields
+    if (planId) investment.planId = planId;
+    if (amount) investment.amount = amount;
+    if (dailyProfit) investment.dailyProfit = dailyProfit;
+    if (monthlyProfit) investment.monthlyProfit = monthlyProfit;
+    if (totalProfit) investment.totalProfit = totalProfit;
+
+    // Save the updated user record
+    await user.save();
+
+    res.status(200).json({ message: 'Investment updated successfully', investment });
+  } catch (error) {
+    console.error('Error updating investment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
 module.exports = router;
