@@ -26,7 +26,8 @@ router.post('/:id/investments', async (req, res) => {
       investmentDate: now,
       lastProfitUpdate: now,
       totalProfit: 0,
-      monthlyProfit: 0
+      monthlyProfit: 0,
+      userId
     };
 
     user.investments.push(newInvestment);
