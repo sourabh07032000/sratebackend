@@ -25,7 +25,7 @@ const updateDailyProfits = async () => {
         console.log(`Now: ${now}, Investment Date: ${investmentDate}, Last Update: ${lastUpdate}`);
 
         // First update: Check if it's 5 PM or later on the investment date
-        if (!lastUpdate && now >= fivePM) {
+        if (lastUpdate && now >= fivePM) {
           const plan = investment.planId;
 
           if (!plan || !plan.monthlyReturn) {
