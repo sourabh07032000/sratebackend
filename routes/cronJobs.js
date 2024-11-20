@@ -15,20 +15,17 @@ const updateDailyProfits = async () => {
       user.investments.forEach((investment) => {
         const now = new Date();
         const investmentDate = new Date(investment.investmentDate);
-        const lastUpdate = investment.lastProfitUpdate || investmentDate;
+        const lastUpdate = investment.lastProfitUpdate || null;
 
-        // Debugging: Log details of each investment
+        // Set 5 PM of the investment date
+        const fivePM = new Date(investmentDate);
+        fivePM.setHours(17, 0, 0, 0);
+
         console.log(`User: ${user._id}, Investment: ${investment._id}`);
         console.log(`Now: ${now}, Investment Date: ${investmentDate}, Last Update: ${lastUpdate}`);
 
-        const oneDayInMs = 24 * 60 * 60 * 1000;
-        const todayAt5PM = new Date(now);
-        todayAt5PM.setHours(17, 0, 0, 0); // Set time to 5 PM today
-
-        // Check if the investment needs its first profit update at 5 PM
-        const isFirstUpdate = !investment.lastProfitUpdate;
-        const isToday = investmentDate.toDateString() === now.toDateString();
-        if (isFirstUpdate && isToday && now >= todayAt5PM) {
+        // First update: Check if it's 5 PM or later on the investment date
+        if (!lastUpdate && now >= fivePM) {
           const plan = investment.planId;
 
           if (!plan || !plan.monthlyReturn) {
@@ -44,8 +41,8 @@ const updateDailyProfits = async () => {
           investment.lastProfitUpdate = now; // Set the last update to now
           userModified = true; // Mark the user as modified
         }
-        // Standard update logic for subsequent updates
-        else if (now - new Date(lastUpdate) >= oneDayInMs) {
+        // Standard update for subsequent updates (every 24 hours)
+        else if (lastUpdate && now - new Date(lastUpdate) >= 24 * 60 * 60 * 1000) {
           const plan = investment.planId;
 
           if (!plan || !plan.monthlyReturn) {
