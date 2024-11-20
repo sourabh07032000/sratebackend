@@ -23,13 +23,11 @@ const updateDailyProfits = async () => {
         if (now - new Date(lastUpdate) >= oneDayInMs) {
           const dailyProfit = calculateDailyProfit(investment.amount, investment.planId);
 
-          // Update total profit
-          investment.totalProfit = (investment.totalProfit || 0) + dailyProfit;
-
-          // Update the last profit update date
-          investment.lastProfitUpdate = now;
-
-          userModified = true; // Mark the user as modified
+          if (dailyProfit > 0) { // Ensure profit is calculated
+            investment.totalProfit = (investment.totalProfit || 0) + dailyProfit; // Update total profit
+            investment.lastProfitUpdate = now; // Update last update time
+            userModified = true; // Mark the user as modified
+          }
         }
       });
 
@@ -45,6 +43,7 @@ const updateDailyProfits = async () => {
     console.error('Error updating daily profits:', error);
   }
 };
+
 
 // Calculate daily profit (modify based on your plan logic)
 const calculateDailyProfit = (amount, planId) => {
