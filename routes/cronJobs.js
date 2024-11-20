@@ -14,19 +14,21 @@ const updateDailyProfits = async () => {
 
       user.investments.forEach((investment) => {
         const now = new Date();
-        const lastUpdate = investment.lastProfitUpdate || investment.investmentDate;
+        const investmentDate = new Date(investment.investmentDate);
+        const lastUpdate = investment.lastProfitUpdate || investmentDate;
 
         // Debugging: Log details of each investment
         console.log(`User: ${user._id}, Investment: ${investment._id}`);
-        console.log(`Now: ${now}, Last Update: ${lastUpdate}`);
+        console.log(`Now: ${now}, Investment Date: ${investmentDate}, Last Update: ${lastUpdate}`);
 
         const oneDayInMs = 24 * 60 * 60 * 1000;
+        const todayAt5PM = new Date(now);
+        todayAt5PM.setHours(17, 0, 0, 0); // Set time to 5 PM today
 
-        // Check if the investment was created today
-        const isToday = new Date(investment.investmentDate).toDateString() === now.toDateString();
-
-        // First update should happen at 5 PM on the day of investment
-        if (isToday && !investment.lastProfitUpdate) {
+        // Check if the investment needs its first profit update at 5 PM
+        const isFirstUpdate = !investment.lastProfitUpdate;
+        const isToday = investmentDate.toDateString() === now.toDateString();
+        if (isFirstUpdate && isToday && now >= todayAt5PM) {
           const plan = investment.planId;
 
           if (!plan || !plan.monthlyReturn) {
@@ -36,13 +38,13 @@ const updateDailyProfits = async () => {
 
           const dailyProfit = calculateDailyProfit(investment.amount, plan.monthlyReturn);
 
-          console.log(`First profit update for investment ${investment._id}: { amount: ${investment.amount}, dailyProfit: ${dailyProfit} }`);
+          console.log(`First profit update for investment ${investment._id}: { amount: ${investment.amount}, dailyProfit: ${dailyProfit.toFixed(2)} }`);
 
           investment.totalProfit = (investment.totalProfit || 0) + dailyProfit; // Update total profit
           investment.lastProfitUpdate = now; // Set the last update to now
           userModified = true; // Mark the user as modified
         }
-        // Standard update logic for subsequent days
+        // Standard update logic for subsequent updates
         else if (now - new Date(lastUpdate) >= oneDayInMs) {
           const plan = investment.planId;
 
@@ -54,7 +56,7 @@ const updateDailyProfits = async () => {
           const dailyProfit = calculateDailyProfit(investment.amount, plan.monthlyReturn);
 
           if (dailyProfit > 0) {
-            console.log(`Updating investment for user ${user._id}: { amount: ${investment.amount}, dailyProfit: ${dailyProfit} }`);
+            console.log(`Updating investment for user ${user._id}: { amount: ${investment.amount}, dailyProfit: ${dailyProfit.toFixed(2)} }`);
 
             investment.totalProfit = (investment.totalProfit || 0) + dailyProfit; // Update total profit
             investment.lastProfitUpdate = now; // Update last update time
@@ -87,12 +89,12 @@ const updateDailyProfits = async () => {
   }
 };
 
-// Calculate daily profit
+// Calculate daily profit with rounding to 2 decimal places
 const calculateDailyProfit = (amount, monthlyROI) => {
   const dailyROI = monthlyROI / 30; // Approximate daily ROI
-  const dailyProfit = (amount * dailyROI) / 100; // Calculate daily profit
-  return parseFloat(dailyProfit.toFixed(2)); // Round to 2 decimal places
+  return parseFloat((amount * dailyROI / 100).toFixed(2)); // Calculate daily profit and round to 2 decimals
 };
+
 
 
 
