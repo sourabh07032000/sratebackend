@@ -21,9 +21,22 @@ const updateDailyProfits = async () => {
 
         // Check if 24 hours have passed since the last profit update
         if (now - new Date(lastUpdate) >= oneDayInMs) {
-          const dailyProfit = calculateDailyProfit(investment.amount, investment.planId);
+          // Ensure `planId` contains the required data
+          const plan = investment.planId;
+          if (!plan || !plan.monthlyReturn) {
+            console.error(`Plan data missing for investment:`, investment);
+            return; // Skip this investment if plan data is missing
+          }
+
+          // Calculate daily profit
+          const dailyProfit = calculateDailyProfit(investment.amount, plan.monthlyReturn);
 
           if (dailyProfit > 0) { // Ensure profit is calculated
+            console.log(`Updating investment for user ${user._id}:`, {
+              amount: investment.amount,
+              dailyProfit,
+            });
+
             investment.totalProfit = (investment.totalProfit || 0) + dailyProfit; // Update total profit
             investment.lastProfitUpdate = now; // Update last update time
             userModified = true; // Mark the user as modified
@@ -32,9 +45,18 @@ const updateDailyProfits = async () => {
       });
 
       if (userModified) {
+        // Ensure investments array is marked as modified
+        user.markModified('investments');
+
         // Save updated user data if modified
-        await user.save();
-        console.log(`Updated daily profits for user: ${user._id}`);
+        try {
+          await user.save();
+          console.log(`Updated daily profits for user: ${user._id}`);
+        } catch (error) {
+          console.error(`Error saving user ${user._id}:`, error);
+        }
+      } else {
+        console.log(`No updates required for user: ${user._id}`);
       }
     }
 
@@ -44,17 +66,10 @@ const updateDailyProfits = async () => {
   }
 };
 
-
-// Calculate daily profit (modify based on your plan logic)
-const calculateDailyProfit = (amount, planId) => {
-  const plans = {
-    basic: { monthlyReturn: 5 }, // 5% monthly return
-    premium: { monthlyReturn: 7 }, // 7% monthly return
-  };
-
-  const monthlyROI = plans[planId]?.monthlyReturn || 0;
+// Calculate daily profit
+const calculateDailyProfit = (amount, monthlyROI) => {
   const dailyROI = monthlyROI / 30; // Approximate daily ROI
-  return (amount * dailyROI) / 100;
+  return (amount * dailyROI) / 100; // Calculate daily profit
 };
 
 // Schedule the cron job to run at 5 PM every day with timezone handling
