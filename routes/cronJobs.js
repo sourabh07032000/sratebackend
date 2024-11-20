@@ -13,34 +13,55 @@ const updateDailyProfits = async () => {
       let userModified = false; // Flag to check if user data has changed
 
       user.investments.forEach((investment) => {
-        const oneDayInMs = 24 * 60 * 60 * 1000;
         const now = new Date();
-
-        // Use lastProfitUpdate or investmentDate for the check
         const lastUpdate = investment.lastProfitUpdate || investment.investmentDate;
 
-        // Check if 24 hours have passed since the last profit update
-        if (now - new Date(lastUpdate) >= oneDayInMs) {
-          // Ensure `planId` contains the required data
+        // Debugging: Log details of each investment
+        console.log(`User: ${user._id}, Investment: ${investment._id}`);
+        console.log(`Now: ${now}, Last Update: ${lastUpdate}`);
+
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+
+        // Check if the investment was created today
+        const isToday = new Date(investment.investmentDate).toDateString() === now.toDateString();
+
+        // First update should happen at 5 PM on the day of investment
+        if (isToday && !investment.lastProfitUpdate) {
           const plan = investment.planId;
+
           if (!plan || !plan.monthlyReturn) {
-            console.error(`Plan data missing for investment:`, investment);
-            return; // Skip this investment if plan data is missing
+            console.log(`Skipping update for investment ${investment._id}: Missing or invalid plan details.`);
+            return; // Skip if plan data is missing
           }
 
-          // Calculate daily profit
           const dailyProfit = calculateDailyProfit(investment.amount, plan.monthlyReturn);
 
-          if (dailyProfit > 0) { // Ensure profit is calculated
-            console.log(`Updating investment for user ${user._id}:`, {
-              amount: investment.amount,
-              dailyProfit,
-            });
+          console.log(`First profit update for investment ${investment._id}: { amount: ${investment.amount}, dailyProfit: ${dailyProfit} }`);
+
+          investment.totalProfit = (investment.totalProfit || 0) + dailyProfit; // Update total profit
+          investment.lastProfitUpdate = now; // Set the last update to now
+          userModified = true; // Mark the user as modified
+        }
+        // Standard update logic for subsequent days
+        else if (now - new Date(lastUpdate) >= oneDayInMs) {
+          const plan = investment.planId;
+
+          if (!plan || !plan.monthlyReturn) {
+            console.log(`Skipping update for investment ${investment._id}: Missing or invalid plan details.`);
+            return; // Skip if plan data is missing
+          }
+
+          const dailyProfit = calculateDailyProfit(investment.amount, plan.monthlyReturn);
+
+          if (dailyProfit > 0) {
+            console.log(`Updating investment for user ${user._id}: { amount: ${investment.amount}, dailyProfit: ${dailyProfit} }`);
 
             investment.totalProfit = (investment.totalProfit || 0) + dailyProfit; // Update total profit
             investment.lastProfitUpdate = now; // Update last update time
             userModified = true; // Mark the user as modified
           }
+        } else {
+          console.log(`No update needed for investment ${investment._id}.`);
         }
       });
 
@@ -69,8 +90,11 @@ const updateDailyProfits = async () => {
 // Calculate daily profit
 const calculateDailyProfit = (amount, monthlyROI) => {
   const dailyROI = monthlyROI / 30; // Approximate daily ROI
-  return (amount * dailyROI) / 100; // Calculate daily profit
+  const dailyProfit = (amount * dailyROI) / 100; // Calculate daily profit
+  return parseFloat(dailyProfit.toFixed(2)); // Round to 2 decimal places
 };
+
+
 
 // Schedule the cron job to run at 5 PM every day with timezone handling
 cron.schedule('0 17 * * *', updateDailyProfits, {
