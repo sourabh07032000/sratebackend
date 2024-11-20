@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cashfreeRoutes = require('./routes/cashfreeRoutes'); // Adjust path as necessary
+const testRoutes = require('./routes/testRoutes'); // Adjust the path to your testRoutes file
+app.use('/api', testRoutes);
 
 
 const app = express();
