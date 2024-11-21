@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cashfreeRoutes = require('./routes/cashfreeRoutes'); // Adjust path as necessary
-const testRoutes = require('./routes/testRoutes'); // Adjust the path to your testRoutes file
+ // Adjust the path to your testRoutes file
 
 
 const app = express();
@@ -30,7 +30,7 @@ app.use('/api', otpRoutes);
 app.use('/plan', plan);
 app.use('/feedback', feedback);
 app.use('/cashfree', cashfreeRoutes); // Cashfree routes ko `/cashfree` prefix ke saath mount kar rahe hain
-app.use('/api', testRoutes);
+
 
 
 
