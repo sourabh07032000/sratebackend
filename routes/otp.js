@@ -21,7 +21,7 @@ router.post("/send-otp", async (req, res) => {
                     countryCode: 91, // Hardcoded country code
                     customerId: CUSTOMER_ID,
                     flowType: "SMS",
-                    mobileNumber: 9630709988,
+                    mobileNumber: mobileNumber,
                 },
                 headers: {
                     authToken: AUTH_TOKEN,
@@ -52,7 +52,7 @@ router.post("/send-otp", async (req, res) => {
 });
 
 // Route to validate OTP
-router.post("/validate-otp", async (req, res) => {
+router.post("/verify-otp", async (req, res) => {
     const { verificationId, mobileNumber, otp } = req.body; // No countryCode required
 
     try {
