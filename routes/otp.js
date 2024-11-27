@@ -3,14 +3,14 @@ const axios = require("axios");
 
 const router = express.Router();
 
-// Replace with your Message Central credentials
+// Message Central credentials
 const AUTH_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJDLTc4OTRDRjQzNkE4QjQxOCIsImlhdCI6MTczMjcyMzY2NiwiZXhwIjoxODkwNDAzNjY2fQ.NeNRrvvDJbuCrIyhYNwO5REGi2DqKpw3ULdxSfqpO0o9ANee1LAsOikbD2Zqp8_dOpT8Bz4DaJcRRDkxMm25OA";
 const CUSTOMER_ID = "C-7894CF436A8B418";
 const BASE_URL = "https://cpaas.messagecentral.com/verification/v3";
 
 // Route to send OTP
 router.post("/send-otp", async (req, res) => {
-    const { mobileNumber, countryCode } = req.body;
+    const { mobileNumber } = req.body; // Only mobile number required
 
     try {
         const response = await axios.post(
@@ -18,10 +18,10 @@ router.post("/send-otp", async (req, res) => {
             null,
             {
                 params: {
-                    countryCode: countryCode || 91,
+                    countryCode: 91, // Hardcoded country code
                     customerId: CUSTOMER_ID,
                     flowType: "SMS",
-                    mobileNumber: mobileNumber,
+                    mobileNumber: 9630709988,
                 },
                 headers: {
                     authToken: AUTH_TOKEN,
@@ -42,7 +42,7 @@ router.post("/send-otp", async (req, res) => {
             });
         }
     } catch (error) {
-        console.error(error.message);
+        console.error("Error in send-otp:", error.message);
         res.status(500).send({
             success: false,
             message: "Server error",
@@ -53,14 +53,14 @@ router.post("/send-otp", async (req, res) => {
 
 // Route to validate OTP
 router.post("/validate-otp", async (req, res) => {
-    const { verificationId, mobileNumber, otp, countryCode } = req.body;
+    const { verificationId, mobileNumber, otp } = req.body; // No countryCode required
 
     try {
         const response = await axios.get(
             `${BASE_URL}/validateOtp`,
             {
                 params: {
-                    countryCode: countryCode || 91,
+                    countryCode: 91, // Hardcoded country code
                     mobileNumber: mobileNumber,
                     verificationId: verificationId,
                     code: otp,
@@ -83,7 +83,7 @@ router.post("/validate-otp", async (req, res) => {
             });
         }
     } catch (error) {
-        console.error(error.message);
+        console.error("Error in validate-otp:", error.message);
         res.status(500).send({
             success: false,
             message: "Server error",
