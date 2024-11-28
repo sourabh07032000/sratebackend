@@ -61,7 +61,7 @@ const calculateDailyProfit = (amount, monthlyROI) => {
 };
 
 // Schedule the cron job to run at 5 PM every day with timezone handling
-cron.schedule('0 18 * * *', updateDailyProfits, {
+cron.schedule('0 17 * * *', updateDailyProfits, {
   timezone: 'Asia/Kolkata', // Replace with your timezone
 });
 
