@@ -25,13 +25,13 @@ const validateRequestFields = (requiredFields) => (req, res, next) => {
 };
 
 // Route to send OTP
-router.post("/send-otp", validateRequestFields(["mobileNumber"]), async (req, res) => {
+router.post("/send-otp", async (req, res) => {
     const { mobileNumber, countryCode } = req.body;
 
     try {
         // Check for tester numbers
         if (TESTER_NUMBERS.includes(mobileNumber)) {
-            console.log(`Tester number detected: ${mobileNumber}`);
+            // console.log(`Tester number detected: ${mobileNumber}`);
             return res.status(200).send({
                 success: true,
                 message: "OTP bypassed for tester number",
