@@ -13,6 +13,16 @@ router.post("/send-otp", async (req, res) => {
     const { mobileNumber, countryCode } = req.body;
 
     try {
+        // Fixed test account logic: Skip API request and return a dummy response
+        if (mobileNumber === "+1234567890") {
+            return res.status(200).send({
+                success: true,
+                message: "OTP sent successfully (test account)",
+                verificationId: "test-verification-id",
+            });
+        }
+
+        // Normal OTP sending logic for other users
         const response = await axios.post(
             `${BASE_URL}/send`,
             null,
@@ -56,6 +66,15 @@ router.post("/validate-otp", async (req, res) => {
     const { verificationId, mobileNumber, otp, countryCode } = req.body;
 
     try {
+        // Fixed test account logic: Bypass API request and return success for specific phone and OTP
+        if (mobileNumber === "+1234567890" && otp === "1234" && verificationId === "test-verification-id") {
+            return res.status(200).send({
+                success: true,
+                message: "OTP verified successfully (test account)",
+            });
+        }
+
+        // Normal OTP validation logic for other users
         const response = await axios.get(
             `${BASE_URL}/validateOtp`,
             {
