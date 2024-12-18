@@ -14,7 +14,7 @@ router.post("/send-otp", async (req, res) => {
 
     try {
         // Fixed test account logic: Skip API request and return a dummy response
-        if (mobileNumber === "+1234567890") {
+        if (mobileNumber === "1234567890") {
             return res.status(200).send({
                 success: true,
                 message: "OTP sent successfully (test account)",
@@ -67,7 +67,7 @@ router.post("/validate-otp", async (req, res) => {
 
     try {
         // Fixed test account logic: Bypass API request and return success for specific phone and OTP
-        if (mobileNumber === "+1234567890" && otp === "1234" && verificationId === "test-verification-id") {
+        if (mobileNumber === "1234567890" && otp === "1234" && verificationId === "test-verification-id") {
             return res.status(200).send({
                 success: true,
                 message: "OTP verified successfully (test account)",
