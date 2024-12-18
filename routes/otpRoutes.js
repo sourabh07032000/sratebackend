@@ -65,48 +65,64 @@ router.post("/send-otp", async (req, res) => {
 router.post("/validate-otp", async (req, res) => {
     const { verificationId, mobileNumber, otp, countryCode } = req.body;
 
+    // Debugging: Log incoming request data
+    console.log("Validation started with data:", { verificationId, mobileNumber, otp, countryCode });
+
+    // Input validation
+    if (!verificationId || !mobileNumber || !otp) {
+        return res.status(400).send({
+            success: false,
+            message: "Missing required fields: verificationId, mobileNumber, and otp are mandatory.",
+        });
+    }
+
+    // Handle test account logic
+    if (mobileNumber === "1234567890" && otp === "1234" && verificationId === "test-verification-id") {
+        console.log("Test account OTP verified successfully.");
+        return res.status(200).send({
+            success: true,
+            message: "OTP verified successfully (test account).",
+        });
+    }
+
     try {
-        // Fixed test account logic: Bypass API request and return success for specific phone and OTP
-        if (mobileNumber === "1234567890" && otp === "1234" && verificationId === "test-verification-id") {
-            return res.status(200).send({
-                success: true,
-                message: "OTP verified successfully (test account)",
-            });
-        }
+        // Validate OTP using external API
+        const response = await axios.get(`${BASE_URL}/validateOtp`, {
+            params: {
+                countryCode: countryCode || 91,
+                mobileNumber,
+                verificationId,
+                code: otp,
+            },
+            headers: {
+                authToken: AUTH_TOKEN,
+            },
+        });
 
-        // Normal OTP validation logic for other users
-        const response = await axios.get(
-            `${BASE_URL}/validateOtp`,
-            {
-                params: {
-                    countryCode: countryCode || 91,
-                    mobileNumber: mobileNumber,
-                    verificationId: verificationId,
-                    code: otp,
-                },
-                headers: {
-                    authToken: AUTH_TOKEN,
-                },
-            }
-        );
+        // Log API response for debugging
+        console.log("API Response:", response.data);
 
+        // Check if the OTP is verified successfully
         if (response.data.responseCode === 200 && response.data.data.verificationStatus === "VERIFICATION_COMPLETED") {
             res.status(200).send({
                 success: true,
-                message: "OTP verified successfully",
+                message: "OTP verified successfully.",
             });
         } else {
+            console.log("Verification failed:", response.data);
             res.status(400).send({
                 success: false,
-                message: "Invalid OTP or verification failed",
+                message: response.data.message || "Invalid OTP or verification failed.",
             });
         }
     } catch (error) {
-        console.error(error.message);
+        // Log Axios error details for debugging
+        console.error("Server error during OTP verification:", error.response ? error.response.data : error.message);
+
         res.status(500).send({
             success: false,
-            message: "Server error",
-            error: error.message,
+            message: "Server error during OTP verification.",
+            error: error.response ? error.response.data : error.message,
         });
     }
 });
