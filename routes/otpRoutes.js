@@ -9,18 +9,27 @@ const CUSTOMER_ID = "C-7894CF436A8B418";
 const BASE_URL = "https://cpaas.messagecentral.com/verification/v3";
 
 // Define tester numbers
-const TESTER_NUMBERS = ["9876543210", "1234567890"]; // Replace with your tester numbers
+const TESTER_NUMBERS = ["9876543210", "1234567890"];
+
+// Middleware for checking required fields
+const validateRequestFields = (requiredFields) => (req, res, next) => {
+    for (const field of requiredFields) {
+        if (!req.body[field]) {
+            return res.status(400).send({
+                success: false,
+                message: `${field} is required.`,
+            });
+        }
+    }
+    next();
+};
 
 // Route to send OTP
-router.post("/send-otp", async (req, res) => {
+router.post("/send-otp", validateRequestFields(["mobileNumber"]), async (req, res) => {
     const { mobileNumber, countryCode } = req.body;
 
-    if (!mobileNumber) {
-        return res.status(400).send({ success: false, message: "Mobile number is required" });
-    }
-
     try {
-        // Check if the number is a tester number
+        // Check for tester numbers
         if (TESTER_NUMBERS.includes(mobileNumber)) {
             console.log(`Tester number detected: ${mobileNumber}`);
             return res.status(200).send({
@@ -40,11 +49,9 @@ router.post("/send-otp", async (req, res) => {
                     countryCode: countryCode || 91,
                     customerId: CUSTOMER_ID,
                     flowType: "SMS",
-                    mobileNumber: mobileNumber,
+                    mobileNumber,
                 },
-                headers: {
-                    authToken: AUTH_TOKEN,
-                },
+                headers: { authToken: AUTH_TOKEN },
             }
         );
 
@@ -64,22 +71,18 @@ router.post("/send-otp", async (req, res) => {
         console.error("Error in send-otp:", error.response?.data || error.message);
         res.status(500).send({
             success: false,
-            message: "Server error",
-            error: error.message,
+            message: "Server error while sending OTP",
+            error: error.response?.data?.message || error.message,
         });
     }
 });
 
 // Route to validate OTP
-router.post("/validate-otp", async (req, res) => {
+router.post("/validate-otp", validateRequestFields(["verificationId", "mobileNumber", "otp"]), async (req, res) => {
     const { verificationId, mobileNumber, otp, countryCode } = req.body;
 
-    if (!mobileNumber || !otp) {
-        return res.status(400).send({ success: false, message: "Mobile number and OTP are required" });
-    }
-
     try {
-        // Check if the number is a tester number
+        // Check for tester numbers
         if (TESTER_NUMBERS.includes(mobileNumber)) {
             console.log(`Tester number validation: ${mobileNumber}`);
             if (otp === "1234") {
@@ -101,13 +104,11 @@ router.post("/validate-otp", async (req, res) => {
             {
                 params: {
                     countryCode: countryCode || 91,
-                    mobileNumber: mobileNumber,
-                    verificationId: verificationId,
+                    mobileNumber,
+                    verificationId,
                     code: otp,
                 },
-                headers: {
-                    authToken: AUTH_TOKEN,
-                },
+                headers: { authToken: AUTH_TOKEN },
             }
         );
 
@@ -126,8 +127,8 @@ router.post("/validate-otp", async (req, res) => {
         console.error("Error in validate-otp:", error.response?.data || error.message);
         res.status(500).send({
             success: false,
-            message: "Server error",
-            error: error.message,
+            message: "Server error while verifying OTP",
+            error: error.response?.data?.message || error.message,
         });
     }
 });
