@@ -85,7 +85,7 @@ router.post("/validate-otp", validateRequestFields(["verificationId", "mobileNum
         // Check for tester numbers
         if (TESTER_NUMBERS.includes(mobileNumber)) {
             console.log(`Tester number validation: ${mobileNumber}`);
-            if (otp === "1234") {
+            if (otp == "1234") {
                 return res.status(200).send({
                     success: true,
                     message: "OTP verified successfully for tester number",
