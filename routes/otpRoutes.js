@@ -72,7 +72,7 @@ router.post("/send-otp", validateRequestFields(["mobileNumber"]), async (req, re
         res.status(500).send({
             success: false,
             message: "Server error while sending OTP",
-            error: error.response?.data?.message || error.message,
+            error: error.response?.data?.message || error.message || "Unknown error",
         });
     }
 });
@@ -128,9 +128,10 @@ router.post("/validate-otp", validateRequestFields(["verificationId", "mobileNum
         res.status(500).send({
             success: false,
             message: "Server error while verifying OTP",
-            error: error.response?.data?.message || error.message,
+            error: error.response?.data?.message || error.message || "Unknown error",
         });
     }
 });
 
 module.exports = router;
+
