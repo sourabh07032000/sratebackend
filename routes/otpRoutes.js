@@ -14,7 +14,7 @@ router.post("/send-otp", async (req, res) => {
 
     try {
         const response = await axios.post(
-            ${BASE_URL}/send,
+            `${BASE_URL}/send`,
             null,
             {
                 params: {
