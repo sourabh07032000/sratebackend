@@ -67,7 +67,7 @@ router.post("/validate-otp", async (req, res) => {
 
     try {
         const response = await axios.get(
-            ${BASE_URL}/validateOtp,
+            `${BASE_URL}/validateOtp`,
             {
                 params: {
                     countryCode: countryCode || 91,
