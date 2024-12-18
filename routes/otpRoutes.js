@@ -2,27 +2,36 @@ const express = require("express");
 const axios = require("axios");
 
 const router = express.Router();
-const TESTER_NUMBERS = ["9876543210", "1234567890"]; // Replace with your tester numbers
 
 // Replace with your Message Central credentials
 const AUTH_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJDLTc4OTRDRjQzNkE4QjQxOCIsImlhdCI6MTczMjcyMzY2NiwiZXhwIjoxODkwNDAzNjY2fQ.NeNRrvvDJbuCrIyhYNwO5REGi2DqKpw3ULdxSfqpO0o9ANee1LAsOikbD2Zqp8_dOpT8Bz4DaJcRRDkxMm25OA";
 const CUSTOMER_ID = "C-7894CF436A8B418";
 const BASE_URL = "https://cpaas.messagecentral.com/verification/v3";
 
+// Define tester numbers
+const TESTER_NUMBERS = ["9876543210", "1234567890"]; // Replace with your tester numbers
+
 // Route to send OTP
 router.post("/send-otp", async (req, res) => {
     const { mobileNumber, countryCode } = req.body;
 
+    if (!mobileNumber) {
+        return res.status(400).send({ success: false, message: "Mobile number is required" });
+    }
+
     try {
         // Check if the number is a tester number
         if (TESTER_NUMBERS.includes(mobileNumber)) {
+            console.log(`Tester number detected: ${mobileNumber}`);
             return res.status(200).send({
                 success: true,
-                message: "Tester OTP sent successfully (always 1234)",
-                verificationId: "tester-verification-id", // Dummy ID for testers
+                message: "OTP bypassed for tester number",
+                verificationId: "TEST_VERIFICATION_ID",
+                otp: "1234", // Static OTP for tester numbers
             });
         }
-        
+
+        // Send OTP for regular users
         const response = await axios.post(
             `${BASE_URL}/send`,
             null,
@@ -52,7 +61,7 @@ router.post("/send-otp", async (req, res) => {
             });
         }
     } catch (error) {
-        console.error(error.message);
+        console.error("Error in send-otp:", error.response?.data || error.message);
         res.status(500).send({
             success: false,
             message: "Server error",
@@ -65,13 +74,18 @@ router.post("/send-otp", async (req, res) => {
 router.post("/validate-otp", async (req, res) => {
     const { verificationId, mobileNumber, otp, countryCode } = req.body;
 
+    if (!mobileNumber || !otp) {
+        return res.status(400).send({ success: false, message: "Mobile number and OTP are required" });
+    }
+
     try {
         // Check if the number is a tester number
         if (TESTER_NUMBERS.includes(mobileNumber)) {
+            console.log(`Tester number validation: ${mobileNumber}`);
             if (otp === "1234") {
                 return res.status(200).send({
                     success: true,
-                    message: "Tester OTP verified successfully",
+                    message: "OTP verified successfully for tester number",
                 });
             } else {
                 return res.status(400).send({
@@ -80,7 +94,8 @@ router.post("/validate-otp", async (req, res) => {
                 });
             }
         }
-        
+
+        // Validate OTP for regular users
         const response = await axios.get(
             `${BASE_URL}/validateOtp`,
             {
@@ -108,7 +123,7 @@ router.post("/validate-otp", async (req, res) => {
             });
         }
     } catch (error) {
-        console.error(error.message);
+        console.error("Error in validate-otp:", error.response?.data || error.message);
         res.status(500).send({
             success: false,
             message: "Server error",
