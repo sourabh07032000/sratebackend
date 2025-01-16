@@ -226,32 +226,27 @@ router.delete('/:userId/investments/:investmentId', async (req, res) => {
       return res.status(400).json({ message: 'Invalid user ID or investment ID format' });
     }
 
-    // Find the user by ID
-    const user = await Signup.findById(userId);
-    if (!user) {
+    // Use findByIdAndUpdate with $pull
+    const updatedUser = await Signup.findByIdAndUpdate(
+      userId,
+      { $pull: { investments: { _id: investmentId } } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Filter out the investment to delete
-    const investmentExists = user.investments.some((inv) => inv._id.toString() === investmentId);
-    if (!investmentExists) {
-      return res.status(404).json({ message: 'Investment not found' });
-    }
-
-    user.investments = user.investments.filter((inv) => inv._id.toString() !== investmentId);
-
-    // Save the updated user document
-    await user.save();
-
     res.status(200).json({
       message: 'Investment deleted successfully',
-      investments: user.investments,
+      investments: updatedUser.investments,
     });
   } catch (error) {
     console.error('Error deleting investment:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 
 
 
