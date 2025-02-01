@@ -261,7 +261,7 @@ router.put("/:userId/investments", async (req, res) => {
       );
 
       if (updatedInvestment) {
-        investment.monthlyProfit += updatedInvestment.totalProfit;
+        investment.monthlyProfit = investment.totalProfit + investment.monthlyProfit;
         investment.totalProfit = 0;
         investment.lastProfitUpdate = new Date();
       }
