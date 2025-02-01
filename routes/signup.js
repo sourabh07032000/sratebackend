@@ -247,6 +247,34 @@ router.delete('/:userId/investments/:investmentId', async (req, res) => {
   }
 });
 
+router.put("/users/:userId/investments", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Update each investment individually
+    user.investments.forEach((investment) => {
+      const updatedInvestment = req.body.investments.find(
+        (inv) => inv._id === investment._id.toString()
+      );
+
+      if (updatedInvestment) {
+        investment.monthlyProfit += updatedInvestment.totalProfit;
+        investment.totalProfit = 0;
+        investment.lastProfitUpdate = new Date();
+      }
+    });
+
+    await user.save();
+    res.json({ message: "Investments updated successfully!", user });
+  } catch (error) {
+    console.error("Error updating investments:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 
