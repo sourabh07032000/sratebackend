@@ -251,7 +251,7 @@ router.put("/:userId/investments", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await Signup.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     // Update each investment individually
