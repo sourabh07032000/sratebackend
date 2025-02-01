@@ -247,7 +247,7 @@ router.delete('/:userId/investments/:investmentId', async (req, res) => {
   }
 });
 
-router.put("/users/:userId/investments", async (req, res) => {
+router.put("/:userId/investments", async (req, res) => {
   try {
     const { userId } = req.params;
 
