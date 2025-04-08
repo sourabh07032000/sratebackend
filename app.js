@@ -8,8 +8,8 @@ const cashfreeRoutes = require('./routes/cashfreeRoutes'); // Adjust path as nec
 
 const app = express();
 
-   const { updateDailyProfits } = require('./routes/cronJobs');
-   updateDailyProfits(); // Initialize the cron job
+   // const { updateDailyProfits } = require('./routes/cronJobs');
+   // updateDailyProfits(); // Initialize the cron job
 
 
 // Middleware to handle CORS
